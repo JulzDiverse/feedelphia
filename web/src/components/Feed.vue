@@ -8,8 +8,8 @@
       </v-flex>
 
       <feed-card
-        v-for="(article, i) in paginatedArticles"
-        :key="article.title"
+        v-for="(photo, i) in paginatedPhotos"
+        :key="photo.title"
         :size="layout[i]"
         :value="article"
       />
@@ -68,6 +68,10 @@
       FeedCard: () => import('@/components/FeedCard')
     },
 
+    mounted: function() {
+       this.downloadContents();
+    },
+
     data: () => ({
       layout: [2, 2, 1, 2, 2, 3, 3, 3, 3, 3, 3],
       page: 1,
@@ -78,22 +82,9 @@
       downloadContents(){
         const url = "http://localhost:8081/photos"
        axios.get(url)
-       .then(function (response) {
+       .then((response) => {
          console.log(response);
-         var contents = response.data;
-         contents.forEach(function(obj){
-          console.log(obj.data);
-          const fs = require('browserify-fs');
-          const reader = new FileReader();
-          reader.readAsDataURL(obj.data)
-          fs.writeFile(obj.hero, reader.result, function(err) {
-              if(err) {
-                console.log(err);
-              } else {
-                console.log("The file was saved!");
-              }
-          });
-        })
+         this.contents = response.data;
        })
        .catch(function (error) {
          console.log(error);
@@ -101,23 +92,18 @@
       }
     },
 
-
     computed: {
       ...mapState(['articles']),
 
       pages () {
         return Math.ceil(this.articles.length / 11)
       },
-      paginatedArticles () {
+      paginatedPhotos () {
         const start = (this.page - 1) * 11
         const stop = this.page * 11
 
         return this.articles.slice(start, stop)
       }
-    },
-
-    beforeMount() {
-       this.downloadContents();
     },
 
     watch: {

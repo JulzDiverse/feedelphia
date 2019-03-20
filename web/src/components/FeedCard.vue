@@ -10,7 +10,7 @@
       href="#!"
     >
       <v-img
-        :src=`${value.hero}`"
+        :src="`http://localhost:8081/photos/${value.hero}`"
         height="100%"
         gradient="rgba(0, 0, 0, .42), rgba(0, 0, 0, .42)"
       >
