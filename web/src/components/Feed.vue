@@ -11,7 +11,7 @@
         v-for="(photo, i) in paginatedPhotos"
         :key="photo.title"
         :size="layout[i]"
-        :value="article"
+        :value="photo"
       />
     </v-layout>
 
@@ -96,13 +96,13 @@
       ...mapState(['articles']),
 
       pages () {
-        return Math.ceil(this.articles.length / 11)
+        return Math.ceil(this.contents.length / 11)
       },
       paginatedPhotos () {
         const start = (this.page - 1) * 11
         const stop = this.page * 11
 
-        return this.articles.slice(start, stop)
+        return this.contents.slice(start, stop)
       }
     },
 
