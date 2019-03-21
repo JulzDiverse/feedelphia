@@ -3,10 +3,6 @@
     app
     flat
   >
-    <v-toolbar-side-icon
-      class="hidden-md-and-up"
-      @click="toggleDrawer"
-    />
     <v-container
       mx-auto
       py-0
@@ -22,7 +18,13 @@
           @click="$vuetify.goTo(0)"
         />
         <v-spacer />
-
+        <v-spacer />
+        <v-spacer />
+        <v-spacer />
+        <v-spacer />
+        <v-spacer />
+        <v-spacer />
+        <v-spacer />
        <uploader />
       </v-layout>
     </v-container>

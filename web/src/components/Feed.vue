@@ -61,6 +61,7 @@
   } from 'vuex'
   import * as axios from 'axios';
 
+
   export default {
     name: 'Feed',
 
@@ -80,8 +81,7 @@
 
     methods: {
       downloadContents(){
-        const url = "http://localhost:8081/photos"
-       axios.get(url)
+       axios.get(this.config.api_url+"/photos")
        .then((response) => {
          console.log(response);
          this.contents = response.data;
@@ -93,7 +93,7 @@
     },
 
     computed: {
-      ...mapState(['articles']),
+      ...mapState(['config']),
 
       pages () {
         return Math.ceil(this.contents.length / 11)

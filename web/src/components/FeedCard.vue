@@ -10,9 +10,9 @@
       href="#!"
     >
       <v-img
-        :src="`http://localhost:8081/photos/${value.hero}`"
+        :src="`${apiUrl}/photos/${value.hero}`"
         height="100%"
-        gradient="rgba(0, 0, 0, .42), rgba(0, 0, 0, .42)"
+        gradient="rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)"
       >
         <v-layout
           v-if="!value.prominent"
@@ -36,6 +36,10 @@
 </template>
 
 <script>
+  import {
+    mapState
+  } from 'vuex'
+
   export default {
     props: {
       size: {
@@ -49,11 +53,17 @@
     },
 
     computed: {
+      ...mapState(['config']),
+
       classes () {
         return {
           'md6': this.size === 2,
           'md4': this.size === 3
         }
+      },
+
+      apiUrl () {
+        return this.config.api_url
       }
     }
   }
