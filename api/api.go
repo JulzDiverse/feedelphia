@@ -5,10 +5,15 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"image/png"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -67,12 +72,47 @@ func (p *PhotoHandler) getPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	buffer := bytes.NewBuffer(photo.Data)
-
+	buffer2 := bytes.NewBuffer(photo.Data)
+	compressed := bytes.NewBuffer([]byte{})
 	//if err := jpeg.Encode(buffer, photo.Data, nil); err != nil {
 	//log.Println("unable to encode image.")
 	//}
+	mime, err := guessImageFormat(buffer2)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	w.Header().Set("Content-Type", "image/jpeg")
+	var img image.Image
+
+	if mime == "png" {
+		img, err = png.Decode(buffer)
+		if err != nil {
+			log.Fatal(err)
+		}
+		encoder := png.Encoder{CompressionLevel: png.BestCompression}
+
+		err = encoder.Encode(compressed, img)
+		if err != nil {
+			log.Fatal(err)
+		}
+		buffer = compressed
+		w.Header().Set("Content-Type", "image/png")
+	}
+
+	if mime == "jpeg" {
+		img, err = jpeg.Decode(buffer)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = jpeg.Encode(compressed, img, &jpeg.Options{Quality: 30})
+		if err != nil {
+			log.Fatal(err)
+		}
+		buffer = compressed
+		w.Header().Set("Content-Type", "image/jpeg")
+	}
+
 	w.Header().Set("Content-Length", strconv.Itoa(len(buffer.Bytes())))
 	if _, err := w.Write(buffer.Bytes()); err != nil {
 		log.Println("unable to write image.")
@@ -80,8 +120,6 @@ func (p *PhotoHandler) getPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 }
 
 func (p *PhotoHandler) addPhoto(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Println("Adding photo")
-
 	file, _, err := r.FormFile("photo")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -113,4 +151,11 @@ func (p *PhotoHandler) addPhoto(w http.ResponseWriter, r *http.Request, _ httpro
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusAccepted)
+}
+
+// Guess image format from gif/jpeg/png/webp
+func guessImageFormat(r io.Reader) (format string, err error) {
+	_, format, err = image.DecodeConfig(r)
+	format = strings.TrimSpace(format)
+	return
 }
