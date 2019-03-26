@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/nfnt/resize"
 )
 
 type PhotoBase interface {
@@ -56,7 +57,6 @@ func (p *PhotoHandler) listPhotos(w http.ResponseWriter, r *http.Request, _ http
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	err = json.NewEncoder(w).Encode(&photoList)
 	if err != nil {
 		fmt.Println(err)
@@ -74,9 +74,7 @@ func (p *PhotoHandler) getPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	buffer := bytes.NewBuffer(photo.Data)
 	buffer2 := bytes.NewBuffer(photo.Data)
 	compressed := bytes.NewBuffer([]byte{})
-	//if err := jpeg.Encode(buffer, photo.Data, nil); err != nil {
-	//log.Println("unable to encode image.")
-	//}
+
 	mime, err := guessImageFormat(buffer2)
 	if err != nil {
 		log.Fatal(err)
@@ -84,35 +82,31 @@ func (p *PhotoHandler) getPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	var img image.Image
 
-	if mime == "png" {
+	switch mime {
+	case "png":
 		img, err = png.Decode(buffer)
-		if err != nil {
-			log.Fatal(err)
-		}
-		encoder := png.Encoder{CompressionLevel: png.BestCompression}
-
-		err = encoder.Encode(compressed, img)
-		if err != nil {
-			log.Fatal(err)
-		}
-		buffer = compressed
-		w.Header().Set("Content-Type", "image/png")
-	}
-
-	if mime == "jpeg" {
+	case "jpeg":
 		img, err = jpeg.Decode(buffer)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = jpeg.Encode(compressed, img, &jpeg.Options{Quality: 30})
-		if err != nil {
-			log.Fatal(err)
-		}
-		buffer = compressed
-		w.Header().Set("Content-Type", "image/jpeg")
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resized := resize.Resize(uint(1024), uint(0), img, resize.Lanczos3)
+
+	err = jpeg.Encode(compressed, resized, &jpeg.Options{Quality: 30})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	buffer = compressed
+
+	w.Header().Set("Etag", fmt.Sprintf(`"%s"`, id))
+	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(len(buffer.Bytes())))
 	if _, err := w.Write(buffer.Bytes()); err != nil {
 		log.Println("unable to write image.")

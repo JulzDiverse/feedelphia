@@ -18,6 +18,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:34534b73e925d20cc72cf202f8b482fdcbe3a1b113e19375f31aadabd0f0f97d"
+  name = "github.com/nfnt/resize"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "83c6a9932646f83e3267f353373d47347b6036b2"
+
+[[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
   name = "google.golang.org/appengine"
   packages = ["cloudsql"]
@@ -31,6 +39,7 @@
   input-imports = [
     "github.com/go-sql-driver/mysql",
     "github.com/julienschmidt/httprouter",
+    "github.com/nfnt/resize",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
