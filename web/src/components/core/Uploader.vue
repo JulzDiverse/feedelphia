@@ -22,7 +22,7 @@
                 hidden
                 >
                 <div class="text-sm-center">
-                <v-btn flat icon color="light-blue lighten-1" dark v-on="on" @click="chooseFile()">
+                <v-btn flat icon color="light-blue lighten-1" dark @click="chooseFile()">
                   <v-icon x-large>mdi-camera</v-icon>
                 </v-btn>
                 </div>

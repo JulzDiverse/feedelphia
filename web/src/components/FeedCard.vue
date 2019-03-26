@@ -10,6 +10,7 @@
       href="#!"
     >
       <v-img
+        :lazy-src="require('@/assets/logo.png')"
         :src="`${apiUrl}/photos/${value.hero}`"
         height="100%"
         gradient="rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)"

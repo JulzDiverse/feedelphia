@@ -10,12 +10,12 @@ export default new Vuex.Store({
     drawer: false,
     items: [
       {
-        text: 'Home',
+        text: 'Feed',
         to: '/'
       },
       {
-        text: 'About',
-        href: '#about'
+        text: 'Info',
+        to: '/info'
       }
     ]
   },
