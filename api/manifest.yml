@@ -1,0 +1,5 @@
+---
+applications:
+  - name: feed-api
+    env:
+      GOPACKAGENAME: github.com/JulzDiverse/feedelphia/api
