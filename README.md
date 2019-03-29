@@ -104,4 +104,11 @@ To get metrics for your apps you can use `prometheus`, you can easily install it
 $ helm install --name prometheus stable/prometheus 
 ```
 
+Get the Prometheus server URL by running these commands in the same shell:
+
+```command
+$ export POD_NAME=$(kubectl get pods --namespace prometheus -l "app=prometheus,component=server" -o jsonpath="{.items[0].metadata.name}")
+$ kubectl --namespace prometheus port-forward $POD_NAME 9090
+```
+
 Follow the helm instruction after you install `prometheus` and all pods are running and ready. 
